@@ -75,6 +75,47 @@
 		db.movies.find({"actors": "Tom Hanks"}, {title: 1});
 		// Show title, remove all other properties(including _id) from output 
 		db.movies.find({"actors": "Tom Hanks"}, {title: 1,_id: 0});
+##### Comparision operators
+		/** General syntax of comaprision operators  **/
+		/** field : {$operator : value} **/
+		/** field : {$operator : [value1, value2]} //For $in, $nin **/
+	
+		db.movieDetails.find({runtime: {$gt : 50}});
+		db.movieDetails.find({runtime: {$gt : 50, $lte : 80}});
+		db.movieDetails.find({"tomato.meter" : {$gt :50},runtime: {$gt : 50, $lte : 80}});
+		db.movieDetails.find({rated: { $ne : "UNRATED"}});
+		db.movieDetails.find({rated: { $in : ["PG", "PG-13", "R"]}});
+##### Element operators
+		//To match based on element's existence or non-existence
+		db.movieDetails.find({"tomato.meter" : {$exists : false}});
+		db.movieDetails.find({"tomato.meter" : {$exists : false}});
+		//To match based on type of elements
+		db.movieDetails.find({_id : {$type : "objectId"}});
+		db.movieDetails.find({_id : {$type : "string"}});
+##### Logical operators
+		// or operator
+		db.movieDetails.find({ $or : [{"tomato.meter" : {$gt :50}},{runtime: {$gt : 50, $lte : 80}}]});
+		// and operator for different fields are implicit by , 
+		// ie, below two queries fetch same result.
+		db.movieDetails.find({"tomato.meter" : {$gt :50},runtime: {$gt : 50, $lte : 80}});
+		db.movieDetails.find({ $and: [{"tomato.meter" : {$gt :50}},{runtime: {$gt : 50, $lte : 80}}]});
+		db.movieDetails.find({"tomato.meter" : {$exists : true, $ne : null}});
+##### Regex operator
+		db.movieDetails.find({ "awards.text" : { $regex: /^Won.*/}});
+##### Array operators
+		//To check the array contains all the mentioned values.
+		//ie, the array can contain these values in any order along with other values too
+		db.movieDetails.find({genres :{$all :["Comedy","Crime","Drama"]}});
+
+		//To match the sizeof array
+		db.movieDetails.find({genres: {$size :2}});
+
+		//To match the complex element in the array against multiple conditions.
+
+		//lets say documents contains field boxOffice like below,
+		//boxOffice: [{country: "UK",value: 50},{country: "US",value: 20}]
+		//To match documents having boxoffice in UK and value >30
+		db.movieDetails.find({boxOffice: {$elemMatch: {country: "UK", value : {$gt: 30}}}});
 ##### Helper methods.
 
 * count()  - To count the resultset
